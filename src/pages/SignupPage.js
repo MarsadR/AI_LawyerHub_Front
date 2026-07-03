@@ -10,7 +10,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Country, State, City } from 'country-state-city';
 
-const API = 'http://localhost:4000';
+const API = process.env.REACT_APP_API_URL || 'https://palevioletred-butterfly-534853.hostingersite.com';
 
 const LAW_EXPERTISES = [
   "Family Law","Criminal Laws","Civil Laws","Corporate Laws",

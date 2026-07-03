@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API = 'http://localhost:4000';
+const API = process.env.REACT_APP_API_URL || 'https://palevioletred-butterfly-534853.hostingersite.com';
 
 export const AuthContext = createContext(null);
 
