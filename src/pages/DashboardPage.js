@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  Calendar, Clock, Users, TrendingUp, ArrowRight, CheckCircle2,
-  AlertCircle, FileText, MessageSquare, Gavel, Bot, Shield,
-  ChevronRight, Star, Activity
+  Calendar, Users, TrendingUp, ArrowRight, CheckCircle2,
+  FileText, MessageSquare, Gavel, Bot, Shield,
+  ChevronRight, Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -76,7 +76,7 @@ function KYCAlert({ status, navigate }) {
 }
 
 export default function DashboardPage() {
-  const { user, token, API } = useAuth();
+  const { user, API } = useAuth();
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [kycStatus, setKycStatus] = useState(user?.kycStatus || 'not_submitted');
@@ -112,10 +112,7 @@ export default function DashboardPage() {
     return t >= todayStart && t <= todayEnd;
   });
 
-  const upcomingAppts = confirmed.filter(a => {
-    if (!a.startTimeUtc) return false;
-    return new Date(a.startTimeUtc) > new Date();
-  }).slice(0, 5);
+
 
   const stats = [
     { icon: Calendar, value: todayAppts.length, label: "Today's Sessions", color: 'blue',   delay: 0.1 },

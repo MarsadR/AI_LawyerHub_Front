@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Calendar, Clock, Check, X, ChevronDown, ChevronUp,
-  User, MessageSquare, AlertCircle, RefreshCw, Trash2,
-  Filter, Search, Eye
+  Calendar, Check, X, ChevronDown, ChevronUp,
+  RefreshCw, Trash2, Search
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
