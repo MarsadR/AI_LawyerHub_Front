@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowRight, Mail, Phone, Building2,
@@ -62,6 +63,7 @@ function AmbientParticles() {
 }
 
 export default function AboutPage() {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] });
 
@@ -85,7 +87,7 @@ export default function AboutPage() {
         {/* Ambient Glow Orbs */}
         <div style={{
           position: 'absolute', width: 600, height: 600, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
           top: -200, right: -150, pointerEvents: 'none'
         }} />
         <div style={{
@@ -124,10 +126,7 @@ export default function AboutPage() {
             }}
           >
             Pioneering the Next Era of <br />
-            <span style={{
-              background: 'linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #34D399 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-            }}>
+            <span style={{ color: '#60A5FA' }}>
               Pakistani Legal Technology
             </span>
           </motion.h1>
@@ -182,8 +181,8 @@ export default function AboutPage() {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '5px 14px', borderRadius: 99,
-                background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)',
-                color: '#34D399', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', marginBottom: 12
+                background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
+                color: '#60A5FA', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', marginBottom: 12
               }}
             >
               <Sparkles size={13} /> Official Platform Highlights
@@ -200,26 +199,26 @@ export default function AboutPage() {
                 lbl: 'Initial Release & Early Access',
                 tag: '100% Free Access',
                 icon: Sparkles,
-                grad: 'linear-gradient(135deg, #34D399 0%, #10B981 100%)',
-                bgGlow: 'rgba(16, 185, 129, 0.15)',
-                borderCol: 'rgba(16, 185, 129, 0.3)'
+                color: '#60A5FA',
+                bgGlow: 'rgba(59, 130, 246, 0.12)',
+                borderCol: 'rgba(59, 130, 246, 0.3)'
               },
               {
                 val: '50,000+',
                 lbl: 'Pakistani Statutes & Citations',
                 tag: 'Instant AI Search',
                 icon: BookOpen,
-                grad: 'linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%)',
-                bgGlow: 'rgba(139, 92, 246, 0.15)',
-                borderCol: 'rgba(139, 92, 246, 0.3)'
+                color: '#3B82F6',
+                bgGlow: 'rgba(59, 130, 246, 0.15)',
+                borderCol: 'rgba(59, 130, 246, 0.3)'
               },
               {
                 val: '99.9%',
                 lbl: 'Cloud Uptime & Availability',
                 tag: 'QubitKode Cloud',
                 icon: Zap,
-                grad: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
-                bgGlow: 'rgba(59, 130, 246, 0.15)',
+                color: '#93C5FD',
+                bgGlow: 'rgba(59, 130, 246, 0.12)',
                 borderCol: 'rgba(59, 130, 246, 0.3)'
               },
               {
@@ -227,9 +226,9 @@ export default function AboutPage() {
                 lbl: 'Bank-Grade Data Encryption',
                 tag: 'Zero-Trust Storage',
                 icon: ShieldCheck,
-                grad: 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)',
-                bgGlow: 'rgba(245, 158, 11, 0.15)',
-                borderCol: 'rgba(245, 158, 11, 0.3)'
+                color: '#2563EB',
+                bgGlow: 'rgba(59, 130, 246, 0.15)',
+                borderCol: 'rgba(59, 130, 246, 0.3)'
               }
             ].map((st, i) => (
               <motion.div
@@ -280,13 +279,13 @@ export default function AboutPage() {
                     marginBottom: 16
                   }}
                 >
-                  <st.icon size={26} color="#fff" />
+                  <st.icon size={26} color={st.color} />
                 </motion.div>
 
-                {/* Number / Value with Gradient */}
+                {/* Number / Value */}
                 <div style={{
                   fontSize: 34, fontWeight: 900, letterSpacing: '-1px',
-                  background: st.grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  color: st.color,
                   marginBottom: 8
                 }}>
                   {st.val}
@@ -308,16 +307,16 @@ export default function AboutPage() {
           <motion.div
             variants={scaleIn} initial="hidden" whileInView="visible" viewport={{ once: true }}
             style={{
-              background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(26, 34, 52, 0.95))',
+              background: 'var(--surface-2)',
               border: '1px solid rgba(59, 130, 246, 0.3)',
               borderRadius: 32, padding: '54px 44px',
-              boxShadow: '0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+              boxShadow: '0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
               position: 'relative', overflow: 'hidden'
             }}
           >
             <div style={{
               position: 'absolute', top: -100, right: -100, width: 350, height: 350,
-              background: 'radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)',
               pointerEvents: 'none'
             }} />
 
@@ -326,8 +325,8 @@ export default function AboutPage() {
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '6px 14px', borderRadius: 99,
-                  background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)',
-                  color: '#34D399', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', marginBottom: 16
+                  background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
+                  color: '#60A5FA', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', marginBottom: 16
                 }}>
                   <ShieldCheck size={14} /> Official Parent Company
                 </div>
@@ -349,7 +348,7 @@ export default function AboutPage() {
                     'Custom enterprise solutions for legal offices & bar associations'
                   ].map((item, idx) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'var(--text-2)' }}>
-                      <CheckCircle2 size={18} color="#34D399" style={{ flexShrink: 0 }} />
+                      <CheckCircle2 size={18} color="#60A5FA" style={{ flexShrink: 0 }} />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -372,11 +371,11 @@ export default function AboutPage() {
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 8,
                       padding: '12px 20px', borderRadius: 14,
-                      background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)',
-                      color: '#34D399', fontSize: 14, fontWeight: 600, textDecoration: 'none'
+                      background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
+                      color: '#60A5FA', fontSize: 14, fontWeight: 600, textDecoration: 'none'
                     }}
                   >
-                    <Phone size={16} color="#34D399" /> +92 330 4677732
+                    <Phone size={16} color="#60A5FA" /> +92 330 4677732
                   </a>
                 </div>
               </div>
@@ -384,10 +383,10 @@ export default function AboutPage() {
               {/* Company Badges Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {[
-                  { title: 'AI Engineering', desc: 'Custom LLMs trained on Pakistani Case Law', icon: Cpu, col: '#8B5CF6' },
-                  { title: 'Zero Trust Security', desc: 'End-to-end encrypted databases', icon: Lock, col: '#10B981' },
-                  { title: 'High Availability', desc: 'Cloud multi-region redundancy', icon: Globe, col: '#3B82F6' },
-                  { title: 'Advocate First', desc: 'Designed with active High Court attorneys', icon: Sparkles, col: '#F59E0B' }
+                  { title: 'AI Engineering', desc: 'Custom LLMs trained on Pakistani Case Law', icon: Cpu, col: '#60A5FA' },
+                  { title: 'Zero Trust Security', desc: 'End-to-end encrypted databases', icon: Lock, col: '#3B82F6' },
+                  { title: 'High Availability', desc: 'Cloud multi-region redundancy', icon: Globe, col: '#93C5FD' },
+                  { title: 'Advocate First', desc: 'Designed with active High Court attorneys', icon: Sparkles, col: '#2563EB' }
                 ].map((b, i) => (
                   <div key={i} style={{
                     background: 'var(--surface)', border: '1px solid var(--border)',
@@ -449,10 +448,10 @@ export default function AboutPage() {
             >
               <div style={{
                 width: 52, height: 52, borderRadius: 16,
-                background: 'rgba(139,92,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 20
               }}>
-                <Eye size={26} color="#A78BFA" />
+                <Eye size={26} color="#60A5FA" />
               </div>
               <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>Our Vision</h3>
               <p style={{ fontSize: 14.5, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>
@@ -470,10 +469,10 @@ export default function AboutPage() {
             >
               <div style={{
                 width: 52, height: 52, borderRadius: 16,
-                background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 20
               }}>
-                <HeartHandshake size={26} color="#34D399" />
+                <HeartHandshake size={26} color="#60A5FA" />
               </div>
               <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>Core Values</h3>
               <p style={{ fontSize: 14.5, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>

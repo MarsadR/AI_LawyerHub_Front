@@ -1,9 +1,7 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
 import './LandingPage.css';
 
 /* ── Inline SVG icon set ─────────────────────────────────── */
@@ -222,57 +220,7 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.85, ease: [0.16,1,0.3,1], delay: i * 0.12 } }),
 };
 
-/* ── GLB Scene model ──────────────────────────────────────── */
-function GLBModel() {
-  const { scene } = useGLTF('/organic_dot_grid.glb');
-  const ref = useRef();
 
-  useFrame(({ clock }) => {
-    if (!ref.current) return;
-    const t = clock.getElapsedTime();
-    ref.current.rotation.y = t * 0.06;
-    ref.current.rotation.x = Math.sin(t * 0.04) * 0.08;
-    ref.current.position.y = Math.sin(t * 0.35) * 0.12;
-  });
-
-  // Tint all mesh materials to match the blue palette
-  useEffect(() => {
-    scene.traverse((child) => {
-      if (child.isMesh && child.material) {
-        const mats = Array.isArray(child.material) ? child.material : [child.material];
-        mats.forEach((mat) => {
-          mat.color?.setHex(0x3b82f6);
-          mat.emissive?.setHex(0x1d4ed8);
-          if (mat.emissiveIntensity !== undefined) mat.emissiveIntensity = 0.55;
-          mat.transparent = true;
-          mat.opacity = 0.72;
-        });
-      }
-    });
-  }, [scene]);
-
-  return <primitive ref={ref} object={scene} scale={3.2} position={[0, 0, 0]} />;
-}
-
-/* ── Full-page Three.js GLB background ──────────────────── */
-function GLBBackground() {
-  return (
-    <div className="lp-glb-bg">
-      <Canvas
-        camera={{ position: [0, 0, 6], fov: 55 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-        dpr={Math.min(window.devicePixelRatio, 2)}
-      >
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 8, 5]} intensity={0.8} color="#60a5fa" />
-        <pointLight position={[-6, -4, -4]} intensity={0.5} color="#3b82f6" />
-        <Suspense fallback={null}>
-          <GLBModel />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
-}
 
 /* ── Component ─────────────────────────────────────────── */
 export default function LandingPage() {
@@ -293,8 +241,10 @@ export default function LandingPage() {
   return (
     <div className="lp-root">
 
-      {/* Fixed Full-Page 3D GLB Background */}
-      <GLBBackground />
+      {/* Clean Full-Page Background */}
+      <div className="lp-grid-bg" />
+      <div className="lp-hero-glow" />
+      <Particles />
 
       {/* ── NAV ─────────────────────────────── */}
       <motion.nav className={`lp-nav ${navScrolled ? 'lp-nav-scrolled' : ''}`}

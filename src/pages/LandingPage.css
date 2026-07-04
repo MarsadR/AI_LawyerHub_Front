@@ -110,26 +110,7 @@
   pointer-events: none; z-index: 0;
 }
 
-/* Three.js GLB Full-Page Background */
-.lp-glb-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.82;
-  overflow: hidden;
-  filter: drop-shadow(0 0 60px rgba(59, 130, 246, 0.25));
-}
 
-.lp-glb-bg canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  outline: none;
-}
 
 /* Copy */
 .lp-hero-copy { position: relative; z-index: 2; }
