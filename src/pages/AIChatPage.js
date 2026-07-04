@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Bot, Send, User, Loader2, RefreshCw,
   Copy, Zap, Plus, Menu, MessageSquare,
-  Trash2, Check, Pencil, X, Code2
+  Trash2, Check, Pencil, X
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -255,7 +255,6 @@ export default function AIChatPage() {
   const [editingMsgId, setEditingMsgId] = useState(null);
   const [editText, setEditText] = useState('');
   const [longPressMenu, setLongPressMenu] = useState(null); // { msgId, msgIdx, x, y }
-  const [codeMode, setCodeMode] = useState(false);
 
   const bottomRef = useRef();
   const inputRef = useRef();
@@ -964,43 +963,6 @@ export default function AIChatPage() {
             )}
           </div>
 
-          {/* Code block toggle */}
-          <button
-            onClick={() => {
-              if (!codeMode) {
-                // Wrap current input in a code fence
-                const fence = '```\n' + (input ? input + '\n' : '') + '```';
-                setInput(fence);
-                setCodeMode(true);
-                setTimeout(() => {
-                  if (inputRef.current) {
-                    const pos = fence.indexOf('\n') + 1;
-                    inputRef.current.setSelectionRange(pos, pos + (input ? input.length : 0));
-                    inputRef.current.focus();
-                  }
-                }, 30);
-              } else {
-                // Strip code fences
-                const stripped = input.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '');
-                setInput(stripped);
-                setCodeMode(false);
-                setTimeout(() => inputRef.current?.focus(), 30);
-              }
-            }}
-            title={codeMode ? 'Exit code mode' : 'Insert code block'}
-            style={{
-              background: codeMode ? 'rgba(52,211,153,0.15)' : 'none',
-              border: codeMode ? '1px solid rgba(52,211,153,0.4)' : 'none',
-              borderRadius: 8, width: 30, height: 30, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-              color: codeMode ? '#34D399' : 'var(--text-muted)',
-              transition: 'all 0.2s'
-            }}
-          >
-            <Code2 size={16} />
-          </button>
-
           <textarea
             ref={inputRef}
             value={input}
@@ -1012,12 +974,12 @@ export default function AIChatPage() {
               e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px';
             }}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }}}
-            placeholder={codeMode ? 'Paste your code here…' : mode === 'general' ? 'Ask general questions…' : 'Search legal references & citations…'}
+            placeholder={mode === 'general' ? 'Ask general questions…' : 'Search legal references & citations…'}
             style={{
               flex: 1, background: 'none', border: 'none', outline: 'none',
-              color: codeMode ? '#34D399' : 'var(--text)',
+              color: 'var(--text)',
               fontSize: 14,
-              fontFamily: codeMode ? "'Fira Code', 'Cascadia Code', 'Courier New', monospace" : 'inherit',
+              fontFamily: 'inherit',
               padding: '8px 0',
               resize: 'none',
               overflow: 'hidden',
