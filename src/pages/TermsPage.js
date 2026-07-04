@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import PublicNavbar from '../components/PublicNavbar';
 
 export default function TermsPage() {
   const navigate = useNavigate();
@@ -10,40 +11,7 @@ export default function TermsPage() {
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* ── Header ── */}
-      <nav style={{
-        height: 72, borderBottom: '1px solid var(--border)',
-        background: 'rgba(7, 11, 20, 0.85)', backdropFilter: 'blur(20px)',
-        position: 'sticky', top: 0, zIndex: 100, padding: '0 32px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 12,
-            background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <img src="/lawyerhublogo.png" alt="AI LawyerHub" style={{ width: 26, height: 26, objectFit: 'contain' }} />
-          </div>
-          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>AI LawyerHub</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 14, fontWeight: 600 }}>
-          <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Home</Link>
-          <Link to="/about" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>About Us</Link>
-          <Link to="/terms" style={{ color: 'var(--primary-light)', textDecoration: 'none', fontWeight: 700 }}>Terms</Link>
-          <Link to="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
-          <Link to="/contact" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Contact</Link>
-          {user ? (
-            <button className="btn btn-primary btn-sm" onClick={() => navigate('/dashboard')}>
-              Dashboard <ArrowRight size={14} />
-            </button>
-          ) : (
-            <button className="btn btn-primary btn-sm" onClick={() => navigate('/login')}>
-              Sign In <ArrowRight size={14} />
-            </button>
-          )}
-        </div>
-      </nav>
+      <PublicNavbar />
 
       {/* ── Page Content ── */}
       <div style={{ maxWidth: 900, width: '100%', margin: '0 auto', padding: '60px 24px 80px', flex: 1 }}>

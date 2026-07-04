@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import Spline from '@splinetool/react-spline';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
 import './LandingPage.css';
 
 /* ── Inline SVG icon set ─────────────────────────────────── */
@@ -221,74 +222,55 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.85, ease: [0.16,1,0.3,1], delay: i * 0.12 } }),
 };
 
-function OrganicDotGridCanvas() {
-  const canvasRef = useRef(null);
+/* ── GLB Scene model ──────────────────────────────────────── */
+function GLBModel() {
+  const { scene } = useGLTF('/organic_dot_grid.glb');
+  const ref = useRef();
 
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    ref.current.rotation.y = t * 0.06;
+    ref.current.rotation.x = Math.sin(t * 0.04) * 0.08;
+    ref.current.position.y = Math.sin(t * 0.35) * 0.12;
+  });
+
+  // Tint all mesh materials to match the blue palette
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener('resize', handleResize, { passive: true });
-
-    const cols = Math.floor(width / 34);
-    const rows = Math.floor(height / 34);
-    const spacingX = width / cols;
-    const spacingY = height / rows;
-    let count = 0;
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-      count += 0.018;
-
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const x = i * spacingX + spacingX / 2;
-          const y = j * spacingY + spacingY / 2;
-
-          const wave = Math.sin(count + i * 0.16 + j * 0.16);
-          const radius = Math.max(1, 1.8 + wave * 1.2);
-          const alpha = Math.min(1, 0.14 + wave * 0.1);
-
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
-          ctx.fill();
-        }
+    scene.traverse((child) => {
+      if (child.isMesh && child.material) {
+        const mats = Array.isArray(child.material) ? child.material : [child.material];
+        mats.forEach((mat) => {
+          mat.color?.setHex(0x3b82f6);
+          mat.emissive?.setHex(0x1d4ed8);
+          if (mat.emissiveIntensity !== undefined) mat.emissiveIntensity = 0.55;
+          mat.transparent = true;
+          mat.opacity = 0.72;
+        });
       }
+    });
+  }, [scene]);
 
-      animationFrameId = requestAnimationFrame(render);
-    };
+  return <primitive ref={ref} object={scene} scale={3.2} position={[0, 0, 0]} />;
+}
 
-    render();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
+/* ── Full-page Three.js GLB background ──────────────────── */
+function GLBBackground() {
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: 0,
-        pointerEvents: 'none'
-      }}
-    />
+    <div className="lp-glb-bg">
+      <Canvas
+        camera={{ position: [0, 0, 6], fov: 55 }}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        dpr={Math.min(window.devicePixelRatio, 2)}
+      >
+        <ambientLight intensity={0.3} />
+        <directionalLight position={[5, 8, 5]} intensity={0.8} color="#60a5fa" />
+        <pointLight position={[-6, -4, -4]} intensity={0.5} color="#3b82f6" />
+        <Suspense fallback={null}>
+          <GLBModel />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }
 
@@ -298,7 +280,6 @@ export default function LandingPage() {
   const { user } = useAuth();
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [splineFailed, setSplineFailed] = useState(false);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.22], [0, -60]);
@@ -312,13 +293,8 @@ export default function LandingPage() {
   return (
     <div className="lp-root">
 
-      {/* Fixed Full-Page Interactive Background */}
-      <OrganicDotGridCanvas />
-      {!splineFailed && (
-        <div className="lp-spline-bg">
-          <Spline scene="/organic_dot_grid.spline" onError={() => setSplineFailed(true)} />
-        </div>
-      )}
+      {/* Fixed Full-Page 3D GLB Background */}
+      <GLBBackground />
 
       {/* ── NAV ─────────────────────────────── */}
       <motion.nav className={`lp-nav ${navScrolled ? 'lp-nav-scrolled' : ''}`}

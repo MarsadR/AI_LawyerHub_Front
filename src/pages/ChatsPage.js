@@ -1051,7 +1051,7 @@ export default function ChatsPage() {
                     }}
                     style={{
                       opacity: msg.pending ? 0.7 : 1,
-                      maxWidth: '65%',
+                      maxWidth: isMobile ? '85%' : '65%',
                       borderRadius: 14,
                       padding: '10px 14px',
                       paddingRight: (hoveredMsgId === msg._id && !msg.deletedForEveryone) ? 28 : 14,
@@ -1059,6 +1059,7 @@ export default function ChatsPage() {
                       color: me ? '#fff' : 'var(--text)',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
                       position: 'relative',
+                      overflow: 'hidden',
                       transform: transformStyle,
                       transition: transitionStyle,
                       cursor: activeChat.type === 'consultation' ? 'pointer' : 'default',
@@ -1203,7 +1204,8 @@ export default function ChatsPage() {
                                   display: 'grid',
                                   gridTemplateColumns: mediaAttachments.length === 1 ? '1fr' : '1fr 1fr',
                                   gap: 6,
-                                  width: 240,
+                                  width: '100%',
+                                  maxWidth: 240,
                                   marginBottom: (msg.text && !msg.text.startsWith('Shared file:')) || fileAttachments.length > 0 ? 8 : 0,
                                   borderRadius: 10,
                                   overflow: 'hidden'
@@ -1285,7 +1287,7 @@ export default function ChatsPage() {
                                       <div key={idx} style={{
                                         padding: '8px 12px', borderRadius: 8,
                                         background: me ? 'rgba(255,255,255,0.12)' : 'var(--surface-3)',
-                                        display: 'flex', flexDirection: 'column', gap: 8, width: 240
+                                        display: 'flex', flexDirection: 'column', gap: 8, width: '100%'
                                       }}>
                                         {/* Inline Visual Document Preview (PDF / Word) */}
                                         {isPreviewable && renderInlineDocPreview(att, type)}

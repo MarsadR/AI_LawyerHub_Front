@@ -110,8 +110,8 @@
   pointer-events: none; z-index: 0;
 }
 
-/* Interactive Spline 3D Full-Page Background */
-.lp-spline-bg {
+/* Three.js GLB Full-Page Background */
+.lp-glb-bg {
   position: fixed;
   top: 0;
   left: 0;
@@ -119,18 +119,16 @@
   height: 100vh;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.88;
+  opacity: 0.82;
   overflow: hidden;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 45px rgba(59, 130, 246, 0.3));
+  filter: drop-shadow(0 0 60px rgba(59, 130, 246, 0.25));
 }
 
-.lp-spline-bg canvas {
-  width: 100vw !important;
-  height: 100vh !important;
+.lp-glb-bg canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
   outline: none;
-  touch-action: none;
-  pointer-events: none;
 }
 
 /* Copy */

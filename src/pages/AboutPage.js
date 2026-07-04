@@ -7,6 +7,7 @@ import {
   Target, Eye, HeartHandshake, ShieldCheck, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import PublicNavbar from '../components/PublicNavbar';
 
 /* ── Animation Variants ── */
 const fadeUp = {
@@ -75,43 +76,7 @@ export default function AboutPage() {
     <div ref={containerRef} style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
       
       {/* ── Navbar ── */}
-      <motion.nav
-        initial={{ y: -70, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          height: 72, borderBottom: '1px solid var(--border)',
-          background: 'rgba(7, 11, 20, 0.85)', backdropFilter: 'blur(20px)',
-          position: 'sticky', top: 0, zIndex: 100, padding: '0 32px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 12,
-            background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <img src="/lawyerhublogo.png" alt="AI LawyerHub" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-          </div>
-          <span style={{ fontSize: 21, fontWeight: 900, letterSpacing: -0.5 }}>AI LawyerHub</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 28, fontSize: 14, fontWeight: 600 }}>
-          <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
-          <Link to="/about" style={{ color: 'var(--primary-light)', textDecoration: 'none', fontWeight: 700 }}>About Us</Link>
-          <Link to="/contact" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }}>Contact</Link>
-          {user ? (
-            <motion.button className="btn btn-primary btn-sm" onClick={() => navigate('/dashboard')} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-              Dashboard <ArrowRight size={14} />
-            </motion.button>
-          ) : (
-            <motion.button className="btn btn-primary btn-sm" onClick={() => navigate('/login')} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-              Sign In <ArrowRight size={14} />
-            </motion.button>
-          )}
-        </div>
-      </motion.nav>
+      <PublicNavbar />
 
       {/* ── CINEMATIC HERO SECTION ── */}
       <section style={{
