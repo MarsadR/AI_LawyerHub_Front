@@ -1,12 +1,10 @@
 import React, { useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowRight, Mail, Phone, Building2,
   CheckCircle2, Zap, Cpu, Lock, Globe, Sparkles,
   Target, Eye, HeartHandshake, ShieldCheck, BookOpen
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../components/PublicNavbar';
 
 /* ── Animation Variants ── */
@@ -64,8 +62,6 @@ function AmbientParticles() {
 }
 
 export default function AboutPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] });
 

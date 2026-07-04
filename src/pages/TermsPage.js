@@ -1,12 +1,8 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, FileText } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { FileText } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 
 export default function TermsPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

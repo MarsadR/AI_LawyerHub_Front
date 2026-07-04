@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Phone, Send, Building2, ArrowRight, MessageSquare, ExternalLink } from 'lucide-react';
+import { Mail, Phone, Send, Building2, MessageSquare, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../context/AuthContext';
 import PublicNavbar from '../components/PublicNavbar';
 
 export default function ContactPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);
 
