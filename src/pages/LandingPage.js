@@ -232,58 +232,35 @@ function OrganicDotGridCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    let mouseX = width / 2;
-    let mouseY = height / 2;
-    let targetMouseX = width / 2;
-    let targetMouseY = height / 2;
-
-    const handleMouseMove = (e) => {
-      targetMouseX = e.clientX;
-      targetMouseY = e.clientY;
-    };
-
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('resize', handleResize, { passive: true });
 
-    const cols = Math.floor(width / 32);
-    const rows = Math.floor(height / 32);
+    const cols = Math.floor(width / 34);
+    const rows = Math.floor(height / 34);
     const spacingX = width / cols;
     const spacingY = height / rows;
     let count = 0;
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-      mouseX += (targetMouseX - mouseX) * 0.06;
-      mouseY += (targetMouseY - mouseY) * 0.06;
-      count += 0.025;
+      count += 0.018;
 
       for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
           const x = i * spacingX + spacingX / 2;
           const y = j * spacingY + spacingY / 2;
 
-          const dx = mouseX - x;
-          const dy = mouseY - y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const maxDist = 320;
-
-          const wave = Math.sin(count + i * 0.18 + j * 0.18);
-          const mouseEffect = Math.max(0, 1 - dist / maxDist);
-          const radius = Math.max(1, 2 + wave * 1.4 + mouseEffect * 5);
-          const alpha = Math.min(1, 0.12 + wave * 0.1 + mouseEffect * 0.75);
+          const wave = Math.sin(count + i * 0.16 + j * 0.16);
+          const radius = Math.max(1, 1.8 + wave * 1.2);
+          const alpha = Math.min(1, 0.14 + wave * 0.1);
 
           ctx.beginPath();
           ctx.arc(x, y, radius, 0, Math.PI * 2);
-          if (mouseEffect > 0.3) {
-            ctx.fillStyle = `rgba(147, 197, 253, ${alpha})`;
-          } else {
-            ctx.fillStyle = `rgba(59, 130, 246, ${alpha * 0.75})`;
-          }
+          ctx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
           ctx.fill();
         }
       }
@@ -295,7 +272,6 @@ function OrganicDotGridCanvas() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
     };
   }, []);

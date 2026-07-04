@@ -544,6 +544,22 @@
 }
 .lp-mobile-menu-btn svg { width: 22px; height: 22px; }
 
+/* ── Fixed Background Optimization ── */
+.lp-spline-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none !important;
+  overflow: hidden;
+}
+.lp-spline-bg canvas,
+.lp-spline-bg iframe {
+  pointer-events: none !important;
+}
+
 @media (max-width: 640px) {
   .lp-nav-links { display: none; }
   .lp-nav-cta { display: none; }
@@ -554,3 +570,4 @@
   .lp-cta-trust-row { flex-direction: column; gap: 8px; align-items: center; }
   .lp-testi-grid { grid-template-columns: 1fr; }
 }
+
