@@ -507,6 +507,22 @@ export default function ChatsPage() {
   const handleAttachFile = (e) => {
     const file = e.target.files[0];
     if (!file || !activeChat) return;
+
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    const forbiddenExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+    const isDocument = forbiddenExts.includes(ext) || 
+      file.type.includes('pdf') || 
+      file.type.includes('officedocument') || 
+      file.type.includes('msword') || 
+      file.type.includes('ms-excel') || 
+      file.type.includes('ms-powerpoint');
+
+    if (isDocument) {
+      toast.error('Documents (PDF, DOCX, Excel, PPTX) cannot be sent in chat');
+      e.target.value = null;
+      return;
+    }
+
     setSelectedFile(file);
     e.target.value = null; // Clear target value to allow re-uploading same file
   };
@@ -990,7 +1006,7 @@ export default function ChatsPage() {
                     justifyContent: me ? 'flex-end' : 'flex-start',
                     position: 'relative',
                     touchAction: 'pan-y',
-                    zIndex: activeMenuMsg === msg._id ? 100 : 2 // Hoist active menu rows to the top layer to prevent overlap issues
+                    zIndex: activeMenuMsg === msg._id ? 10000 : (hoveredMsgId === msg._id ? 1000 : (messages.length - i + 10))
                   }}
                   onMouseEnter={() => setHoveredMsgId(msg._id)}
                   onMouseLeave={() => setHoveredMsgId(null)}
@@ -1054,19 +1070,19 @@ export default function ChatsPage() {
                       maxWidth: isMobile ? '85%' : '65%',
                       borderRadius: 14,
                       padding: '10px 14px',
-                      paddingRight: (hoveredMsgId === msg._id && !msg.deletedForEveryone) ? 28 : 14,
+                      paddingRight: (!msg.deletedForEveryone && (isMobile || hoveredMsgId === msg._id || activeMenuMsg === msg._id)) ? 28 : 14,
                       background: me ? 'var(--primary)' : 'var(--surface-2)',
                       color: me ? '#fff' : 'var(--text)',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
                       position: 'relative',
-                      overflow: 'hidden',
+                      overflow: 'visible',
                       transform: transformStyle,
                       transition: transitionStyle,
                       cursor: activeChat.type === 'consultation' ? 'pointer' : 'default',
                       userSelect: 'none',
                       WebkitUserSelect: 'none',
                       WebkitTouchCallout: 'none',
-                      zIndex: 2
+                      zIndex: activeMenuMsg === msg._id ? 10000 : 2
                     }}
                   >
                     
@@ -1102,13 +1118,13 @@ export default function ChatsPage() {
                               position: 'absolute',
                               right: me ? 0 : 'auto',
                               left: me ? 'auto' : 0,
-                              top: openUpwards ? 'auto' : 24,
-                              bottom: openUpwards ? 24 : 'auto',
-                              width: 155,
+                              top: openUpwards ? 'auto' : 26,
+                              bottom: openUpwards ? 26 : 'auto',
+                              width: 160,
                               background: 'var(--surface-2)', border: '1px solid var(--border)',
-                              borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-                              padding: 4, display: 'flex', flexDirection: 'column', gap: 2,
-                              zIndex: 200
+                              borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
+                              padding: 5, display: 'flex', flexDirection: 'column', gap: 2,
+                              zIndex: 10000
                             }}>
                               {activeChat.type === 'consultation' && (
                                 <button 
@@ -1458,7 +1474,7 @@ export default function ChatsPage() {
               <Paperclip size={16} color={(isBlocked || isBlockedByOther) ? 'var(--text-dim)' : 'var(--text-muted)'} />
               <input 
                 type="file" 
-                accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx"
+                accept="image/*,video/*"
                 style={{ display: 'none' }} 
                 onChange={handleAttachFile} 
                 disabled={isBlocked || isBlockedByOther} 
