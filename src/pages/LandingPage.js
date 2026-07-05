@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import './LandingPage.css';
 
 /* ── Inline SVG icon set ─────────────────────────────────── */
@@ -220,14 +220,242 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.85, ease: [0.16,1,0.3,1], delay: i * 0.12 } }),
 };
 
+/* ── AI Trial Demo Modal ───────────────────────────────── */
+const LS_GENERAL = 'lh_trial_general_used';
+const LS_LEGAL   = 'lh_trial_legal_used';
+const API_URL    = process.env.REACT_APP_API_URL || 'https://palevioletred-butterfly-534853.hostingersite.com';
 
+function AITrialModal({ onClose }) {
+  const [tab, setTab]         = useState('general'); // 'general' | 'legal'
+  const [input, setInput]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const [reply, setReply]     = useState(null);
+  const [error, setError]     = useState(null);
+  const inputRef = useRef(null);
 
-/* ── Component ─────────────────────────────────────────── */
+  const generalUsed = !!localStorage.getItem(LS_GENERAL);
+  const legalUsed   = !!localStorage.getItem(LS_LEGAL);
+
+  const currentUsed = tab === 'general' ? generalUsed : legalUsed;
+
+  // Reset reply when switching tabs
+  useEffect(() => { setReply(null); setError(null); setInput(''); }, [tab]);
+
+  // Focus input on open
+  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 120); }, []);
+
+  // Close on Escape
+  useEffect(() => {
+    const fn = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [onClose]);
+
+  const handleSend = useCallback(async () => {
+    if (!input.trim() || loading || currentUsed) return;
+    setLoading(true);
+    setError(null);
+    setReply(null);
+    try {
+      const res = await fetch(`${API_URL}/api/public-ai-trial`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input.trim(), mode: tab })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReply(data.reply);
+        // Mark this tab's trial as used
+        localStorage.setItem(tab === 'general' ? LS_GENERAL : LS_LEGAL, '1');
+      } else {
+        setError(data.message || 'Something went wrong.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [input, loading, currentUsed, tab]);
+
+  const navigate = useNavigate();
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="ai-trial-overlay"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      >
+        <motion.div
+          className="ai-trial-modal"
+          initial={{ opacity: 0, scale: 0.9, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 40 }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Header */}
+          <div className="ai-trial-header">
+            <div className="ai-trial-title-wrap">
+              <div className="ai-trial-icon-badge">
+                <Icon.Bot />
+              </div>
+              <div>
+                <h3 className="ai-trial-title">Try AI LawyerHub</h3>
+                <p className="ai-trial-subtitle">1 free General Chat query · Legal References requires an account</p>
+              </div>
+            </div>
+            <button className="ai-trial-close" onClick={onClose} aria-label="Close">
+              <Icon.Close />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="ai-trial-tabs">
+            <button
+              className={`ai-trial-tab ${tab === 'general' ? 'active' : ''}`}
+              onClick={() => setTab('general')}
+            >
+              <Icon.Chat />
+              General Chat
+              {generalUsed && <span className="ai-trial-used-pill">Used</span>}
+            </button>
+            <button
+              className={`ai-trial-tab ${tab === 'legal' ? 'active' : ''}`}
+              onClick={() => setTab('legal')}
+            >
+              <Icon.Book />
+              Legal References
+              {legalUsed && <span className="ai-trial-used-pill">Used</span>}
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="ai-trial-body">
+            {/* Legal References tab — always requires account */}
+            {tab === 'legal' ? (
+              <div className="ai-trial-exhausted">
+                <motion.div
+                  initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: [0.16,1,0.3,1] }}
+                >
+                  <div className="ai-trial-exhausted-icon"><Icon.Book /></div>
+                  <h4>Account Required for Legal References</h4>
+                  <p>Our Pakistan Legal RAG model with statutes, PPC, CrPC and case law requires a free account to access. Sign up in seconds.</p>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <motion.button
+                      className="lp-cta-primary"
+                      style={{ flex: 1, minWidth: 140, justifyContent: 'center' }}
+                      onClick={() => { onClose(); navigate('/signup'); }}
+                      whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    >
+                      <span>Create Free Account</span>
+                      <span className="lp-cta-arrow"><Icon.Arrow /></span>
+                    </motion.button>
+                    <motion.button
+                      className="lp-cta-ghost"
+                      style={{ flex: 1, minWidth: 120 }}
+                      onClick={() => { onClose(); navigate('/login'); }}
+                      whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    >
+                      Sign In
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </div>
+            ) : generalUsed && reply === null ? (
+              /* General Chat already used */
+              <div className="ai-trial-exhausted">
+                <div className="ai-trial-exhausted-icon" style={{ color: '#60A5FA' }}><Icon.Check /></div>
+                <h4>You've used your free General Chat query.</h4>
+                <p>Sign up for free to get unlimited AI access, or try Legal References with an account.</p>
+                <motion.button
+                  className="lp-cta-primary"
+                  style={{ marginTop: 16, width: '100%', justifyContent: 'center' }}
+                  onClick={() => { onClose(); navigate('/signup'); }}
+                  whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                >
+                  <span>Sign Up Free</span>
+                  <span className="lp-cta-arrow"><Icon.Arrow /></span>
+                </motion.button>
+              </div>
+            ) : reply ? (
+              /* Show AI reply */
+              <div className="ai-trial-reply-wrap">
+                <div className="ai-trial-user-bubble">
+                  <span className="ai-trial-bubble-label">You</span>
+                  <p>{input || '(your question)'}</p>
+                </div>
+                <div className="ai-trial-ai-bubble">
+                  <span className="ai-trial-bubble-label ai-bubble-lbl-blue">AI LawyerHub</span>
+                  <p>{reply}</p>
+                </div>
+                <div className="ai-trial-reply-footer">
+                  <p className="ai-trial-reply-hint">✨ Want unlimited responses? Sign up for free.</p>
+                  <motion.button
+                    className="lp-cta-primary"
+                    style={{ padding: '11px 24px', fontSize: 14 }}
+                    onClick={() => { onClose(); navigate('/signup'); }}
+                    whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                  >
+                    Get Full Access <span className="lp-cta-arrow"><Icon.Arrow /></span>
+                  </motion.button>
+                </div>
+              </div>
+            ) : (
+              /* General Chat input */
+              <div className="ai-trial-input-area">
+                <div className="ai-trial-prompt-hint">
+                  💬 Ask anything — legal concepts, document drafting, general advice…
+                </div>
+                <div className="ai-trial-input-row">
+                  <textarea
+                    ref={inputRef}
+                    className="ai-trial-textarea"
+                    placeholder="e.g. What is the difference between civil and criminal cases?"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    disabled={loading}
+                    maxLength={1000}
+                    rows={3}
+                  />
+                  <motion.button
+                    className="ai-trial-send-btn"
+                    onClick={handleSend}
+                    disabled={!input.trim() || loading}
+                    whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }}
+                    aria-label="Send query"
+                  >
+                    {loading
+                      ? <div className="ai-trial-spinner" />
+                      : <Icon.Arrow />}
+                  </motion.button>
+                </div>
+                {error && <p className="ai-trial-error">{error}</p>}
+                <p className="ai-trial-char-hint">{input.length}/1000 · Press Enter to send</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="ai-trial-footer">
+            <span>🔒 No data stored · No account needed</span>
+            <button className="ai-trial-signup-link" onClick={() => { onClose(); navigate('/signup'); }}>
+              Sign up for unlimited access →
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [trialOpen, setTrialOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.22], [0, -60]);
@@ -371,18 +599,24 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 1.65, ease: [0.16,1,0.3,1] }}>
             <motion.button className="lp-cta-primary"
-              onClick={() => navigate(user ? '/dashboard' : '/signup')}
+              onClick={() => navigate(user ? '/dashboard' : '/login')}
               whileHover={{ scale: 1.05, boxShadow: '0 0 64px rgba(59,130,246,0.75)' }} whileTap={{ scale: 0.96 }}>
-              <span>{user ? 'Go to Dashboard' : 'Start Free — No Card Required'}</span>
+              <span>{user ? 'Go to Dashboard' : 'Free Signup / Login'}</span>
               <motion.span className="lp-cta-arrow" animate={{ x: [0,4,0] }} transition={{ duration: 1.8, repeat: Infinity }}>
                 <Icon.Arrow />
               </motion.span>
             </motion.button>
+
             {!user && (
-              <motion.button className="lp-cta-ghost"
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                Explore Features
+              <motion.button
+                className="lp-cta-ai-pill"
+                onClick={() => setTrialOpen(true)}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 32px rgba(59,130,246,0.5)', borderColor: 'rgba(59,130,246,0.7)' }}
+                whileTap={{ scale: 0.96 }}
+              >
+                <span className="lp-ai-pill-live-dot" />
+                <Icon.Bot />
+                <span>Try AI Free</span>
               </motion.button>
             )}
           </motion.div>
@@ -402,6 +636,9 @@ export default function LandingPage() {
             <div className="lp-scroll-wheel" />
           </motion.div>
         </motion.div>
+
+        {/* AI Trial Modal */}
+        {trialOpen && <AITrialModal onClose={() => setTrialOpen(false)} />}
       </section>
 
       {/* ── FEATURES ───────────────────────── */}

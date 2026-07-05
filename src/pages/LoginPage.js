@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -49,6 +49,27 @@ export default function LoginPage() {
       ))}
 
       <div className="auth-box" style={{ maxWidth: 460 }}>
+        {/* Home button */}
+        <div style={{ marginBottom: 24 }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              background: 'rgba(59,130,246,0.08)',
+              border: '1px solid rgba(59,130,246,0.2)',
+              color: 'rgba(148,163,184,0.8)',
+              padding: '7px 14px', borderRadius: 9,
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              fontFamily: 'inherit', transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(59,130,246,0.14)'; e.currentTarget.style.color='#93C5FD'; e.currentTarget.style.borderColor='rgba(59,130,246,0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(59,130,246,0.08)'; e.currentTarget.style.color='rgba(148,163,184,0.8)'; e.currentTarget.style.borderColor='rgba(59,130,246,0.2)'; }}
+          >
+            <Home size={14} />
+            Home
+          </button>
+        </div>
+
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{

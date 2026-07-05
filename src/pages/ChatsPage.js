@@ -116,19 +116,9 @@ export default function ChatsPage() {
   const renderInlineDocPreview = (att, type) => {
     const isLocal = att.url?.includes('localhost') || att.url?.includes('127.0.0.1');
 
-    if (type === 'pdf') {
-      return (
-        <div style={{ width: '100%', height: 130, background: '#fff', overflow: 'hidden', borderRadius: 6, position: 'relative', border: '1px solid var(--border)', marginBottom: 8 }}>
-          <embed 
-            src={att.url} 
-            type="application/pdf"
-            style={{ width: '100%', height: '100%', border: 'none', pointerEvents: 'none' }}
-          />
-        </div>
-      );
-    }
-    if (type === 'office') {
+    if (type === 'pdf' || type === 'office') {
       if (isLocal) {
+        // Local files can't be previewed by Google Docs Viewer — show a placeholder
         return (
           <div style={{ 
             width: '100%', height: 130, background: 'var(--surface-2)', 
@@ -136,17 +126,18 @@ export default function ChatsPage() {
             borderRadius: 6, border: '1px solid var(--border)', marginBottom: 8, padding: 12, textAlign: 'center' 
           }}>
             <FileText size={24} color="var(--primary-light)" style={{ marginBottom: 4 }} />
-            <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.8 }}>Local Office Document</span>
-            <span style={{ fontSize: 9, opacity: 0.6, marginTop: 2 }}>Previews require public URL. Click Download to open.</span>
+            <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.8 }}>{type === 'pdf' ? 'PDF Document' : 'Office Document'}</span>
+            <span style={{ fontSize: 9, opacity: 0.6, marginTop: 2 }}>Click Download to open.</span>
           </div>
         );
       }
-      const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(att.url)}`;
+      // Use Google Docs Viewer — works with Cloudinary raw URLs
+      const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(att.url)}&embedded=true`;
       return (
         <div style={{ width: '100%', height: 130, background: '#fff', overflow: 'hidden', borderRadius: 6, position: 'relative', border: '1px solid var(--border)', marginBottom: 8 }}>
           <iframe 
-            src={officeUrl} 
-            title="Office Inline"
+            src={googleViewerUrl} 
+            title="Document Preview"
             style={{ width: '100%', height: '100%', border: 'none', pointerEvents: 'none' }}
           />
         </div>
@@ -508,17 +499,10 @@ export default function ChatsPage() {
     const file = e.target.files[0];
     if (!file || !activeChat) return;
 
-    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-    const forbiddenExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
-    const isDocument = forbiddenExts.includes(ext) || 
-      file.type.includes('pdf') || 
-      file.type.includes('officedocument') || 
-      file.type.includes('msword') || 
-      file.type.includes('ms-excel') || 
-      file.type.includes('ms-powerpoint');
-
-    if (isDocument) {
-      toast.error('Documents (PDF, DOCX, Excel, PPTX) cannot be sent in chat');
+    // Check file size (100 MB limit)
+    const MAX_SIZE = 100 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error('File is too large. Maximum allowed size is 100 MB.');
       e.target.value = null;
       return;
     }
@@ -605,40 +589,27 @@ export default function ChatsPage() {
       );
     }
     
-    if (mediaViewer.type === 'pdf') {
-      return (
-        <embed 
-          src={mediaViewer.url} 
-          type="application/pdf"
-          style={{ 
-            width: '85vw', height: '80vh', 
-            border: 'none', borderRadius: 8, 
-            background: '#fff',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.5)'
-          }} 
-        />
-      );
-    }
-    
-    if (mediaViewer.type === 'office') {
+    if (mediaViewer.type === 'pdf' || mediaViewer.type === 'office') {
       const isLocal = mediaViewer.url?.includes('localhost') || mediaViewer.url?.includes('127.0.0.1');
       if (isLocal) {
         return (
           <div style={{ color: '#fff', textAlign: 'center', padding: 24 }}>
             <FileText size={64} color="var(--primary-light)" style={{ marginBottom: 16, opacity: 0.8 }} />
-            <h4 style={{ margin: '0 0 8px 0', fontSize: 16 }}>Office Document Preview (Local Environment)</h4>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: 16 }}>
+              {mediaViewer.type === 'pdf' ? 'PDF' : 'Office Document'} — Local File
+            </h4>
             <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', maxWidth: 400 }}>
-              Microsoft Office Online preview engine requires a publicly routeable internet URL. 
-              Please click the **Download** button at the top to view the document contents.
+              Preview requires a public URL. Click Download to open the file.
             </p>
           </div>
         );
       }
-      const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(mediaViewer.url)}`;
+      // Use Google Docs Viewer — renders PDFs and Office docs from any public URL
+      const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(mediaViewer.url)}&embedded=true`;
       return (
         <iframe 
-          src={officeUrl} 
-          title="Office Document Preview"
+          src={googleViewerUrl} 
+          title="Document Preview"
           style={{ 
             width: '85vw', height: '80vh', 
             border: 'none', borderRadius: 8, 
@@ -1474,7 +1445,7 @@ export default function ChatsPage() {
               <Paperclip size={16} color={(isBlocked || isBlockedByOther) ? 'var(--text-dim)' : 'var(--text-muted)'} />
               <input 
                 type="file" 
-                accept="image/*,video/*"
+                accept="image/*,video/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                 style={{ display: 'none' }} 
                 onChange={handleAttachFile} 
                 disabled={isBlocked || isBlockedByOther} 
